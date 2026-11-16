@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cuentos de la Historia Argentina · 6º grado A</title>
+  <meta name="description" content="Libro virtual interactivo con los cuentos y audiocuentos de 6º grado A, inspirados en la historia argentina (1853-1920).">
+
+  <!-- Tipografías de época (si no cargan, se usan serif del sistema) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Playfair+Display:ital,wght@0,600;0,800;1,500&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- =====================================================
+       PANTALLA 1: INICIO + ÍNDICE DE CUENTOS
+       ===================================================== -->
+  <main id="inicio" class="vista vista--activa" aria-labelledby="titulo-principal">
+
+    <header class="portada">
+      <p class="portada__sobretitulo">6º grado A · Libro virtual</p>
+      <h1 id="titulo-principal" class="portada__titulo">Cuentos de la<br>Historia Argentina</h1>
+      <p class="portada__periodo"><span class="ornamento" aria-hidden="true">❦</span> 1853 – 1930 <span class="ornamento" aria-hidden="true">❦</span></p>
+      <p class="portada__bajada">Cinco cuentos de misterio inspirados en hechos y personajes de nuestra historia, para leer y escuchar.</p>
+
+      <!-- Botón para iniciar la lectura (abre el primer cuento) -->
+      <button id="btn-comenzar" class="btn btn--principal" type="button">
+        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Zm9-1.5h5.5c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H13V4Z"/></svg>
+        Comenzar la lectura
+      </button>
+    </header>
+
+    <section class="indice" aria-labelledby="titulo-indice">
+      <h2 id="titulo-indice" class="indice__titulo">Índice de cuentos y audiocuentos</h2>
+      <!-- Las tarjetas se generan desde script.js a partir del listado CUENTOS -->
+      <ol id="lista-cuentos" class="indice__lista"></ol>
+    </section>
+
+    <footer class="pie">
+      <p>Producción de los alumnos de 6º grado A · Libro virtual interactivo</p>
+    </footer>
+  </main>
+
+
+  <!-- =====================================================
+       PANTALLA 2: LECTOR (LIBRO VIRTUAL / FLIPBOOK)
+       ===================================================== -->
+  <section id="lector" class="vista" aria-label="Lector del cuento" hidden>
+
+    <!-- Barra superior: volver al inicio, título, audio, pantalla completa -->
+    <div class="lector__barra">
+      <button id="btn-inicio" class="btn btn--icono" type="button" aria-label="Volver al inicio" title="Volver al inicio">
+        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3L12 3Z"/></svg>
+        <span class="btn__texto">Inicio</span>
+      </button>
+
+      <div class="lector__info">
+        <p id="lector-grupo" class="lector__grupo"></p>
+        <h2 id="lector-titulo" class="lector__titulo"></h2>
+      </div>
+
+      <div class="lector__acciones">
+        <!-- Reproductor del audiocuento del cuento abierto -->
+        <div class="reproductor reproductor--compacto">
+          <button id="btn-audio" class="btn btn--icono" type="button" aria-label="Reproducir audiocuento" title="Escuchar audiocuento">
+            <svg class="icono icono--play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z"/></svg>
+            <svg class="icono icono--pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+            <span class="btn__texto">Audiocuento</span>
+          </button>
+          <div class="reproductor__linea">
+            <input id="audio-barra" class="reproductor__barra" type="range" min="0" max="100" value="0" step="0.1" aria-label="Posición del audio">
+            <span id="audio-tiempo" class="reproductor__tiempo">0:00 / 0:00</span>
+          </div>
+          <audio id="audio-lector" preload="metadata"></audio>
+        </div>
+
+        <button id="btn-pantalla" class="btn btn--icono" type="button" aria-label="Pantalla completa" title="Pantalla completa">
+          <svg class="icono icono--expandir" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5v2H6v3H4Zm10-5h6v5h-2V6h-4V4ZM4 15h2v3h3v2H4v-5Zm14 0h2v5h-6v-2h4v-3Z"/></svg>
+          <svg class="icono icono--contraer" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h2v5H4V7h3V4Zm8 0h2v3h3v2h-5V4ZM4 15h5v5H7v-3H4v-2Zm11 0h5v2h-3v3h-2v-5Z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador visual de progreso de lectura -->
+    <div class="progreso" role="progressbar" aria-label="Progreso de lectura" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="progreso-relleno" class="progreso__relleno"></div>
+    </div>
+
+    <!-- Escenario donde se monta el libro (StPageFlip) -->
+    <div id="escenario" class="escenario">
+      <div id="cargando" class="cargando" aria-live="polite">
+        <span class="cargando__pluma" aria-hidden="true">✒</span>
+        Abriendo el libro…
+      </div>
+      <!-- El contenedor #libro se crea dinámicamente desde script.js -->
+    </div>
+
+    <!-- Navegación inferior -->
+    <nav class="navegacion" aria-label="Navegación de páginas">
+      <button id="btn-anterior" class="btn btn--nav" type="button" aria-label="Página anterior">
+        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 5.4 14 4l-8 8 8 8 1.4-1.4L8.8 12l6.6-6.6Z"/></svg>
+        <span class="btn__texto">Página anterior</span>
+      </button>
+
+      <p class="navegacion__indicador" aria-live="polite">
+        <span id="pagina-actual">1</span> / <span id="pagina-total">1</span>
+      </p>
+
+      <button id="btn-siguiente" class="btn btn--nav" type="button" aria-label="Página siguiente">
+        <span class="btn__texto">Página siguiente</span>
+        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.4 10 4l8 8-8 8-1.4-1.4 6.6-6.6-6.6-6.6Z"/></svg>
+      </button>
+    </nav>
+  </section>
+
+  <!-- Biblioteca StPageFlip (PageFlip.js, licencia MIT) incluida localmente -->
+  <script src="lib/page-flip.browser.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
